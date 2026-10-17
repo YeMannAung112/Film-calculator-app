@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Film Calculator Pro</title>
+<style>
+body{margin:0;background:#101827;color:white;font-family:Arial,sans-serif;padding:18px}
+h1{color:#43e6ad;text-align:center}
+.card{background:#1d293b;padding:16px;border-radius:16px;margin:15px 0}
+input{width:95%;padding:12px;margin:7px 0;border-radius:8px;border:1px solid #53657d;background:#101827;color:white;font-size:18px}
+button{padding:12px;border:0;border-radius:9px;background:#10b981;color:white;font-size:16px;margin:4px}
+.result{font-size:28px;color:#43e6ad;font-weight:bold;text-align:center}
+label{display:block;margin-top:10px}
+</style>
+</head>
+<body>
+<h1>FILM CALCULATOR PRO</h1>
+
+<div class="card">
+<h2>⚖️ KG ➜ METER</h2>
+<label>Weight (KG)</label><input id="kg" type="number" value="5" step="any">
+<label>Width (m)</label><input id="width" type="number" value="0.5" step="any">
+<label>Thickness (mm)</label><input id="thick" type="number" value="0.020" step="any">
+<button onclick="calcMeter()">CALCULATE</button>
+<div class="result" id="meterResult">0 METER</div>
+</div>
+
+<div class="card">
+<h2>📏 METER ➜ KG</h2>
+<label>Meter</label><input id="meter" type="number" value="1000" step="any">
+<label>Width (m)</label><input id="width2" type="number" value="0.5" step="any">
+<label>Thickness (mm)</label><input id="thick2" type="number" value="0.020" step="any">
+<button onclick="calcKg()">CALCULATE</button>
+<div class="result" id="kgResult">0 KG</div>
+</div>
+
+<div class="card">
+<h2>⚙️ THICKNESS ➜ MOTOR Hz</h2>
+<label>Current Thickness (micron)</label><input id="oldMic" type="number" value="20" step="any">
+<label>New Thickness (micron)</label><input id="newMic" type="number" value="15" step="any">
+<label>Front Motor Hz</label><input id="front" type="number" value="20" step="any">
+<button onclick="calcHz()">CALCULATE</button>
+<div class="result" id="hzResult">0 Hz</div>
+</div>
+
+<div class="card">
+<h2>📋 HISTORY</h2>
+<button onclick="showHistory()">SHOW HISTORY</button>
+<button onclick="clearHistory()">CLEAR</button>
+<div id="history"></div>
+</div>
+
+<script>
+function saveHistory(s){
+let h=JSON.parse(localStorage.getItem('filmHistory')||'[]');
+h.unshift(new Date().toLocaleString()+' — '+s);
+localStorage.setItem('filmHistory',JSON.stringify(h.slice(0,100)));
+}
+function calcMeter(){
+let k=+kg.value,w=+width.value,t=+thick.value;
+if(k<=0||w<=0||t<=0)return alert('Enter positive values');
+let r=Math.floor(k/0.92/w/t);
+meterResult.textContent=r+' METER';
+saveHistory('KG to Meter: '+r+' METER');
+}
+function calcKg(){
+let m=+meter.value,w=+width2.value,t=+thick2.value;
+if(m<=0||w<=0||t<=0)return alert('Enter positive values');
+let r=m*w*t*0.92;
+kgResult.textContent=r.toFixed(3)+' KG';
+saveHistory('Meter to KG: '+r.toFixed(3)+' KG');
+}
+function calcHz(){
+let o=+oldMic.value,n=+newMic.value,f=+front.value;
+if(o<=0||n<=0||f<=0)return alert('Enter positive values');
+let a=f*o/n,b=a+0.30;
+hzResult.textContent='Front: '+a.toFixed(2)+' Hz | Rear: '+b.toFixed(2)+' Hz';
+saveHistory('New thickness '+n+' micron: Front '+a.toFixed(2)+' Hz, Rear '+b.toFixed(2)+' Hz');
+}
+function showHistory(){
+let h=JSON.parse(localStorage.getItem('filmHistory')||'[]');
+history.innerHTML=h.length?h.map(x=>'<p>'+x.replace(/</g,'&lt;')+'</p>').join(''):'No history yet';
+}
+function clearHistory(){
+if(confirm('Clear all history?')){localStorage.removeItem('filmHistory');showHistory();}
+}
+</script>
+</body>
+</html>
